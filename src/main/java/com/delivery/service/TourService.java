@@ -6,6 +6,7 @@ import com.delivery.repository.TourRepository;
 import com.delivery.repository.DeliveryRepository;
 import com.delivery.repository.VehicleRepository;
 import com.delivery.repository.WarehouseRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+@Service
+@Transactional
 public class TourService {
 
     private static final Logger logger = Logger.getLogger(TourService.class.getName());

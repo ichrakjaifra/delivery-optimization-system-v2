@@ -2,12 +2,15 @@ package com.delivery.service;
 
 import com.delivery.entity.Warehouse;
 import com.delivery.repository.WarehouseRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+@Service
+@Transactional
 public class WarehouseService {
 
     private static final Logger logger = Logger.getLogger(WarehouseService.class.getName());

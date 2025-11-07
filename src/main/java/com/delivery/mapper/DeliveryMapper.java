@@ -4,7 +4,7 @@ import com.delivery.dto.DeliveryDTO;
 import com.delivery.entity.Delivery;
 import org.springframework.stereotype.Component;
 
-
+@Component
 public class DeliveryMapper {
 
     public DeliveryDTO toDTO(Delivery delivery) {
