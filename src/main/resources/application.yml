@@ -1,0 +1,34 @@
+# Configuration par défaut
+spring:
+  profiles:
+    active: dev
+  application:
+    name: delivery-optimization-system
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Spring AI Configuration
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      chat:
+        options:
+          model: gpt-3.5-turbo
+
+server:
+  port: 8080
+
+# Optimizer Configuration
+app:
+  optimizer:
+    active: ai  # ai, nearest_neighbor, clarke_wright
+
+logging:
+  level:
+    com.delivery: DEBUG
+    org.springframework: INFO
