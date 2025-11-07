@@ -19,14 +19,8 @@ public class Delivery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 200)
-    private String address;
-
-    @Column(nullable = false)
-    private Double latitude; // Coordonnée GPS
-
-    @Column(nullable = false)
-    private Double longitude; // Coordonnée GPS
+    // SUPPRIMEZ l'adresse, latitude, longitude de Delivery
+    // Ces informations sont maintenant dans Customer
 
     @Column(nullable = false)
     private Double weight; // en kg
@@ -35,7 +29,7 @@ public class Delivery {
     private Double volume; // en m³
 
     @Column(name = "preferred_time_slot", length = 20)
-    private String preferredTimeSlot; // Format: "09:00-11:00"
+    private String preferredTimeSlot; // Hérité du customer mais peut être overridé
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 15)
@@ -46,6 +40,11 @@ public class Delivery {
     @JsonIgnoreProperties({"deliveries", "vehicle", "warehouse"})
     private Tour tour;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnoreProperties({"deliveries"})
+    private Customer customer;
+
     @Column(name = "delivery_order")
     private Integer order; // Ordre dans la tournée
 
@@ -53,23 +52,36 @@ public class Delivery {
         PENDING, IN_TRANSIT, DELIVERED, FAILED
     }
 
+    // Méthodes pratiques pour accéder aux informations du customer
+    public String getAddress() {
+        return customer != null ? customer.getAddress() : null;
+    }
 
-    private static final Pattern TIME_SLOT_PATTERN =
-            Pattern.compile("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]-([0-1]?[0-9]|2[0-3]):[0-5][0-9]$");
+    public Double getLatitude() {
+        return customer != null ? customer.getLatitude() : null;
+    }
 
+    public Double getLongitude() {
+        return customer != null ? customer.getLongitude() : null;
+    }
 
+    public String getCustomerPreferredTimeSlot() {
+        return customer != null ? customer.getPreferredTimeSlot() : null;
+    }
+
+    // Validation modifiée
     public void validate() {
         validateWeight();
         validateVolume();
         validateTimeSlot();
-        validateCoordinates();
+        validateCustomer();
     }
 
     private void validateWeight() {
         if (this.weight == null || this.weight <= 0) {
             throw new IllegalArgumentException("Le poids doit être positif");
         }
-        if (this.weight > 1000) { // Contrainte réaliste
+        if (this.weight > 1000) {
             throw new IllegalArgumentException("Le poids ne peut pas dépasser 1000kg");
         }
     }
@@ -78,26 +90,27 @@ public class Delivery {
         if (this.volume == null || this.volume <= 0) {
             throw new IllegalArgumentException("Le volume doit être positif");
         }
-        if (this.volume > 10) { // Contrainte réaliste
+        if (this.volume > 10) {
             throw new IllegalArgumentException("Le volume ne peut pas dépasser 10m³");
         }
     }
 
     private void validateTimeSlot() {
-        if (this.preferredTimeSlot != null && !this.preferredTimeSlot.isEmpty()) {
-            if (!TIME_SLOT_PATTERN.matcher(this.preferredTimeSlot).matches()) {
+        String timeSlotToValidate = this.preferredTimeSlot != null ?
+                this.preferredTimeSlot : getCustomerPreferredTimeSlot();
+
+        if (timeSlotToValidate != null && !timeSlotToValidate.isEmpty()) {
+            Pattern TIME_SLOT_PATTERN = Pattern.compile("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]-([0-1]?[0-9]|2[0-3]):[0-5][0-9]$");
+            if (!TIME_SLOT_PATTERN.matcher(timeSlotToValidate).matches()) {
                 throw new IllegalArgumentException("Format de créneau horaire invalide. Utilisez: HH:MM-HH:MM");
             }
         }
     }
 
-    private void validateCoordinates() {
-        if (this.latitude == null || this.latitude < -90 || this.latitude > 90) {
-            throw new IllegalArgumentException("Latitude invalide (-90 à 90)");
+    private void validateCustomer() {
+        if (this.customer == null) {
+            throw new IllegalArgumentException("Le client est obligatoire");
         }
-        if (this.longitude == null || this.longitude < -180 || this.longitude > 180) {
-            throw new IllegalArgumentException("Longitude invalide (-180 à 180)");
-        }
+        this.customer.validate();
     }
-
 }
