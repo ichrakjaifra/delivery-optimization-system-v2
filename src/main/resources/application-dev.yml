@@ -4,7 +4,7 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:h2:file:./data/deliverydb
+    url: jdbc:h2:file:./data/delivery2db
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -15,16 +15,3 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
 
-  # Désactive Spring AI en dev si pas de clé API
-  ai:
-    openai:
-      enabled: false
-
-app:
-  optimizer:
-    active: nearest_neighbor
-
-logging:
-  level:
-    com.delivery: DEBUG
-    org.hibernate.SQL: DEBUG

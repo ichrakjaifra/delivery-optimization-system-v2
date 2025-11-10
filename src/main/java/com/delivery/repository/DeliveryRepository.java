@@ -23,4 +23,7 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
 
     @Query("SELECT d FROM Delivery d WHERE d.tour IS NULL AND d.status = 'PENDING'")
     List<Delivery> findPendingUnassignedDeliveries();
+
+    @Query("SELECT d FROM Delivery d WHERE d.customer.id = :customerId")
+    List<Delivery> findByCustomerId(@Param("customerId") Long customerId);
 }

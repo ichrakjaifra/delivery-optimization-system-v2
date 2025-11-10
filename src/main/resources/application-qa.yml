@@ -6,8 +6,8 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/delivery_qa
     driver-class-name: org.postgresql.Driver
-    username: qa_user
-    password: qa_password
+    username: postgres
+    password: achraf123
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:

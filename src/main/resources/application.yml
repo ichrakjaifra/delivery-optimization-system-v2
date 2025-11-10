@@ -1,34 +1,20 @@
-# Configuration par défaut
-spring:
-  profiles:
-    active: dev
-  application:
-    name: delivery-optimization-system
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
-    properties:
+  # Configuration par dÃ©faut
+  spring:
+    profiles:
+      active: dev
+    application:
+      name: delivery-optimization-system
+    jpa:
       hibernate:
-        format_sql: true
+        ddl-auto: none
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
 
-  # Spring AI Configuration
-  ai:
-    openai:
-      api-key: ${OPENAI_API_KEY:}
-      chat:
-        options:
-          model: gpt-3.5-turbo
+    liquibase:
+      change-log: classpath:/db/changelog/db.changelog-master.xml
+  
+  server:
+    port: 8080
 
-server:
-  port: 8080
-
-# Optimizer Configuration
-app:
-  optimizer:
-    active: ai  # ai, nearest_neighbor, clarke_wright
-
-logging:
-  level:
-    com.delivery: DEBUG
-    org.springframework: INFO

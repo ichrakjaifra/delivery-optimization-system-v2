@@ -19,9 +19,6 @@ public class Delivery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // SUPPRIMEZ l'adresse, latitude, longitude de Delivery
-    // Ces informations sont maintenant dans Customer
-
     @Column(nullable = false)
     private Double weight; // en kg
 
