@@ -2,6 +2,8 @@ package com.delivery.service;
 
 import com.delivery.entity.Customer;
 import com.delivery.repository.CustomerRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,11 @@ public class CustomerService {
     public List<Customer> getAllCustomers() {
         logger.info("Fetching all customers");
         return customerRepository.findAll();
+    }
+
+    public Page<Customer> getAllCustomersPaged(Pageable pageable) {
+        logger.info("Fetching customers with pagination");
+        return customerRepository.findAll(pageable);
     }
 
     public Optional<Customer> getCustomerById(Long id) {
@@ -73,5 +80,28 @@ public class CustomerService {
     public List<Customer> searchCustomersByAddress(String address) {
         logger.info("Searching customers by address: " + address);
         return customerRepository.findByAddressContaining(address);
+    }
+
+    public List<Customer> advancedSearch(String name, String address, String timeSlot) {
+        logger.info("Advanced search - name: " + name + ", address: " + address + ", timeSlot: " + timeSlot);
+
+        if (name != null && address != null && timeSlot != null) {
+            return customerRepository.findByNameContainingAndAddressContainingAndPreferredTimeSlot(
+                    name, address, timeSlot);
+        } else if (name != null && address != null) {
+            return customerRepository.findByNameContainingAndAddressContaining(name, address);
+        } else if (name != null && timeSlot != null) {
+            return customerRepository.findByNameContainingAndPreferredTimeSlot(name, timeSlot);
+        } else if (address != null && timeSlot != null) {
+            return customerRepository.findByAddressContainingAndPreferredTimeSlot(address, timeSlot);
+        } else if (name != null) {
+            return customerRepository.findByNameContainingIgnoreCase(name);
+        } else if (address != null) {
+            return customerRepository.findByAddressContaining(address);
+        } else if (timeSlot != null) {
+            return customerRepository.findByPreferredTimeSlot(timeSlot);
+        } else {
+            return customerRepository.findAll();
+        }
     }
 }

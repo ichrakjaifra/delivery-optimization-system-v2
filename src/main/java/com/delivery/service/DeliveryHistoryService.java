@@ -4,6 +4,8 @@ import com.delivery.entity.DeliveryHistory;
 import com.delivery.entity.Tour;
 import com.delivery.entity.Delivery;
 import com.delivery.repository.DeliveryHistoryRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +60,11 @@ public class DeliveryHistoryService {
     public List<DeliveryHistory> getDelayedDeliveries(Integer minDelay) {
         logger.info("Fetching deliveries with delay greater than: " + minDelay + " minutes");
         return deliveryHistoryRepository.findDelaysGreaterThan(minDelay);
+    }
+
+    public Page<DeliveryHistory> getDeliveryHistoryPaged(Pageable pageable) {
+        logger.info("Fetching delivery history with pagination");
+        return deliveryHistoryRepository.findAll(pageable);
     }
 
     private LocalDateTime calculatePlannedTime(Tour tour, Delivery delivery) {
