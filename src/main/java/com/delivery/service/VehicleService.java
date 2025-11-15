@@ -5,6 +5,7 @@ import com.delivery.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -50,6 +51,42 @@ public class VehicleService {
         }
 
         return vehicleRepository.save(vehicle);
+    }
+
+    // NOUVELLE MÉTHODE POUR LE BATCH
+    @Transactional
+    public List<Vehicle> createVehiclesBatch(List<Vehicle> vehicles) {
+        logger.info("Creating " + vehicles.size() + " vehicles in batch");
+
+        List<Vehicle> createdVehicles = new ArrayList<>();
+
+        for (Vehicle vehicle : vehicles) {
+            try {
+                vehicle.validateConstraints();
+                logger.info("Contraintes validées pour: " + vehicle.getLicensePlate());
+
+                // Vérifier si la plaque d'immatriculation existe déjà
+                Vehicle existing = vehicleRepository.findByLicensePlate(vehicle.getLicensePlate());
+                if (existing != null) {
+                    logger.warning("Vehicle with license plate " + vehicle.getLicensePlate() + " already exists. Skipping.");
+                    continue;
+                }
+
+                Vehicle savedVehicle = vehicleRepository.save(vehicle);
+                createdVehicles.add(savedVehicle);
+                logger.info("Successfully created vehicle: " + vehicle.getLicensePlate());
+
+            } catch (IllegalArgumentException e) {
+                logger.severe("Erreur contraintes véhicule " + vehicle.getLicensePlate() + ": " + e.getMessage());
+                // Continuer avec les autres véhicules même en cas d'erreur
+            } catch (Exception e) {
+                logger.severe("Failed to create vehicle: " + vehicle.getLicensePlate() + " - " + e.getMessage());
+                // Continuer avec les autres véhicules même en cas d'erreur
+            }
+        }
+
+        logger.info("Batch creation completed. Success: " + createdVehicles.size() + "/" + vehicles.size());
+        return createdVehicles;
     }
 
     @Transactional

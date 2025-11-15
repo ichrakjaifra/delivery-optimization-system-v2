@@ -29,6 +29,14 @@ public interface DeliveryHistoryRepository extends JpaRepository<DeliveryHistory
     List<DeliveryHistory> findByDeliveryDateRange(@Param("startDate") java.time.LocalDate startDate,
                                                   @Param("endDate") java.time.LocalDate endDate);
 
+
+    @Query("SELECT COUNT(dh) FROM DeliveryHistory dh WHERE dh.tour.id = :tourId")
+    Long countByTourId(@Param("tourId") Long tourId);
+
+
+    @Query("DELETE FROM DeliveryHistory dh WHERE dh.tour.id = :tourId")
+    void deleteByTourId(@Param("tourId") Long tourId);
+
     // Statistiques avancées
     @Query("SELECT AVG(dh.delayMinutes) FROM DeliveryHistory dh WHERE dh.delayMinutes > 0")
     Double findAverageDelay();

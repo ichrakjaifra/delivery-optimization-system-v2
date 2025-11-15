@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -150,6 +151,27 @@ public class CustomerController {
                     .map(customerMapper::toDTO)
                     .collect(Collectors.toList());
             return ResponseEntity.ok(customers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/batch")
+    @Operation(summary = "Create multiple customers in batch")
+    public ResponseEntity<List<CustomerDTO>> createCustomers(@RequestBody List<CustomerDTO> customerDTOs) {
+        try {
+            List<CustomerDTO> createdCustomers = new ArrayList<>();
+
+            for (CustomerDTO customerDTO : customerDTOs) {
+                Customer customer = customerMapper.toEntity(customerDTO);
+                Customer createdCustomer = customerService.createCustomer(customer);
+                CustomerDTO createdDTO = customerMapper.toDTO(createdCustomer);
+                createdCustomers.add(createdDTO);
+            }
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdCustomers);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

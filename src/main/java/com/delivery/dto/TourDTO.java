@@ -19,5 +19,6 @@ public class TourDTO {
     private Long warehouseId;
     private Tour.AlgorithmType algorithmUsed;
     private Double totalDistance;
+    private Tour.TourStatus status;
     private List<Long> deliveryIds = new ArrayList<>();
 }

@@ -42,6 +42,10 @@ public class Tour {
     @Column(nullable = false)
     private Double totalDistance; // en km
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 15)
+    private TourStatus status = TourStatus.PLANNED;
+
     @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OrderBy("order ASC")
     @JsonIgnore
@@ -51,6 +55,9 @@ public class Tour {
         NEAREST_NEIGHBOR, CLARKE_WRIGHT
     }
 
+    public enum TourStatus {
+        PLANNED, IN_PROGRESS, COMPLETED, CANCELLED
+    }
 
     public boolean isValidForVehicle() {
         if (this.vehicle == null || this.deliveries == null) {

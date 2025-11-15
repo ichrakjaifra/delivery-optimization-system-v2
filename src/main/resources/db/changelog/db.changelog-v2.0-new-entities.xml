@@ -70,4 +70,19 @@
         </rollback>
     </changeSet>
 
+
+    <changeSet id="v2.0-3" author="your_name">
+        <comment>Add status column to tours table</comment>
+
+        <addColumn tableName="tours">
+            <column name="status" type="VARCHAR(15)" defaultValue="PLANNED">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="tours" columnName="status"/>
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>

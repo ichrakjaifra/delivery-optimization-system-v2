@@ -40,10 +40,27 @@ public class DeliveryHistoryService {
                     history.setActualTime(LocalDateTime.now());
                     history.setDayOfWeekFromDate();
                     history.calculateDelay();
+                    history.setNotes("Tour completed on " + LocalDateTime.now());
 
                     deliveryHistoryRepository.save(history);
+
+                    logger.info("Created delivery history for delivery: " + delivery.getId());
                 }
             }
+        }
+        logger.info("Completed creating delivery history for tour: " + tour.getId());
+    }
+
+    public boolean existsHistoryForTour(Long tourId) {
+        return !deliveryHistoryRepository.findByTourId(tourId).isEmpty();
+    }
+
+    @Transactional
+    public void deleteHistoryForTour(Long tourId) {
+        List<DeliveryHistory> historyList = deliveryHistoryRepository.findByTourId(tourId);
+        if (!historyList.isEmpty()) {
+            deliveryHistoryRepository.deleteAll(historyList);
+            logger.info("Deleted " + historyList.size() + " history records for tour: " + tourId);
         }
     }
 
@@ -67,9 +84,20 @@ public class DeliveryHistoryService {
         return deliveryHistoryRepository.findAll(pageable);
     }
 
+    // AJOUT DE CETTE MÉTHODE MANQUANTE
+    public List<DeliveryHistory> getAllDeliveryHistory() {
+        logger.info("Fetching all delivery history");
+        return deliveryHistoryRepository.findAll();
+    }
+
     private LocalDateTime calculatePlannedTime(Tour tour, Delivery delivery) {
-        // Logique simplifiée pour calculer le temps planifié
-        // En réalité, cela devrait être basé sur l'ordre dans la tournée et la distance
-        return tour.getDate().atTime(9, 0).plusMinutes(delivery.getOrder() * 30L);
+        // Logique améliorée pour calculer le temps planifié
+        if (delivery.getOrder() != null) {
+            // Basé sur l'ordre dans la tournée (30 minutes par livraison)
+            return tour.getDate().atTime(8, 0).plusMinutes(delivery.getOrder() * 30L);
+        } else {
+            // Ordre par défaut si non spécifié
+            return tour.getDate().atTime(9, 0);
+        }
     }
 }

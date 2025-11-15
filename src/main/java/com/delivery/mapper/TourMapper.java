@@ -32,6 +32,7 @@ public class TourMapper {
         dto.setWarehouseId(tour.getWarehouse() != null ? tour.getWarehouse().getId() : null);
         dto.setAlgorithmUsed(tour.getAlgorithmUsed());
         dto.setTotalDistance(tour.getTotalDistance());
+        dto.setStatus(tour.getStatus());
         dto.setDeliveryIds(tour.getDeliveries().stream()
                 .map(delivery -> delivery.getId())
                 .collect(Collectors.toList()));
@@ -49,6 +50,7 @@ public class TourMapper {
         tour.setDate(dto.getDate());
         tour.setAlgorithmUsed(dto.getAlgorithmUsed());
         tour.setTotalDistance(dto.getTotalDistance());
+        tour.setStatus(dto.getStatus() != null ? dto.getStatus() : Tour.TourStatus.PLANNED);
 
         if (dto.getVehicleId() != null) {
             tour.setVehicle(vehicleService.getVehicleById(dto.getVehicleId())

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -24,16 +25,18 @@ public class TourService {
     private final DeliveryRepository deliveryRepository;
     private final VehicleRepository vehicleRepository;
     private final WarehouseRepository warehouseRepository;
+    private final DeliveryHistoryService deliveryHistoryService;
     private final TourOptimizer nearestNeighborOptimizer;
     private final TourOptimizer clarkeWrightOptimizer;
 
     public TourService(TourRepository tourRepository, DeliveryRepository deliveryRepository,
-                       VehicleRepository vehicleRepository, WarehouseRepository warehouseRepository,
+                       VehicleRepository vehicleRepository, WarehouseRepository warehouseRepository, DeliveryHistoryService deliveryHistoryService,
                        TourOptimizer nearestNeighborOptimizer, TourOptimizer clarkeWrightOptimizer) {
         this.tourRepository = tourRepository;
         this.deliveryRepository = deliveryRepository;
         this.vehicleRepository = vehicleRepository;
         this.warehouseRepository = warehouseRepository;
+        this.deliveryHistoryService = deliveryHistoryService;
         this.nearestNeighborOptimizer = nearestNeighborOptimizer;
         this.clarkeWrightOptimizer = clarkeWrightOptimizer;
     }
@@ -288,5 +291,65 @@ public class TourService {
 
         tourRepository.delete(tour);
         logger.info("Tour deleted successfully with id: " + id);
+    }
+
+
+    @Transactional
+    public Tour updateTourStatus(Long tourId, Tour.TourStatus newStatus) {
+        logger.info("Updating tour " + tourId + " status to: " + newStatus);
+
+        Tour tour = tourRepository.findById(tourId)
+                .orElseThrow(() -> new RuntimeException("Tour not found with id: " + tourId));
+
+        Tour.TourStatus oldStatus = tour.getStatus();
+        tour.setStatus(newStatus);
+
+        if (newStatus == Tour.TourStatus.COMPLETED && oldStatus != Tour.TourStatus.COMPLETED) {
+            logger.info("Tour " + tourId + " marked as COMPLETED, generating delivery history...");
+
+
+            deliveryHistoryService.createDeliveryHistoryFromCompletedTour(tour);
+
+            logger.info("Delivery history generated for tour: " + tourId);
+        }
+
+        return tourRepository.save(tour);
+    }
+
+    @Transactional
+    public List<Tour> createToursBatch(List<Tour> tours) {
+        logger.info("Creating " + tours.size() + " tours in batch");
+
+        List<Tour> createdTours = new ArrayList<>();
+
+        for (Tour tour : tours) {
+            try {
+                // Vérifier si le véhicule existe
+                if (tour.getVehicle() != null && tour.getVehicle().getId() != null) {
+                    Vehicle vehicle = vehicleRepository.findById(tour.getVehicle().getId())
+                            .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + tour.getVehicle().getId()));
+                    tour.setVehicle(vehicle);
+                }
+
+                // Vérifier si l'entrepôt existe
+                if (tour.getWarehouse() != null && tour.getWarehouse().getId() != null) {
+                    Warehouse warehouse = warehouseRepository.findById(tour.getWarehouse().getId())
+                            .orElseThrow(() -> new RuntimeException("Warehouse not found with id: " + tour.getWarehouse().getId()));
+                    tour.setWarehouse(warehouse);
+                }
+
+                tour.validate();
+                Tour savedTour = tourRepository.save(tour);
+                createdTours.add(savedTour);
+                logger.info("Successfully created tour for date: " + tour.getDate());
+
+            } catch (Exception e) {
+                logger.severe("Failed to create tour for date: " + tour.getDate() + " - " + e.getMessage());
+                // Continuer avec les autres tournées même en cas d'erreur
+            }
+        }
+
+        logger.info("Batch creation completed. Success: " + createdTours.size() + "/" + tours.size());
+        return createdTours;
     }
 }
