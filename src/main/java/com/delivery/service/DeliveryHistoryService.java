@@ -64,15 +64,15 @@ public class DeliveryHistoryService {
         }
     }
 
-    public List<DeliveryHistory> getCustomerDeliveryHistory(Long customerId) {
+    /*public List<DeliveryHistory> getCustomerDeliveryHistory(Long customerId) {
         logger.info("Fetching delivery history for customer: " + customerId);
         return deliveryHistoryRepository.findByCustomerId(customerId);
-    }
+    }*/
 
-    public List<DeliveryHistory> getTourDeliveryHistory(Long tourId) {
+    /*public List<DeliveryHistory> getTourDeliveryHistory(Long tourId) {
         logger.info("Fetching delivery history for tour: " + tourId);
         return deliveryHistoryRepository.findByTourId(tourId);
-    }
+    }*/
 
     public List<DeliveryHistory> getDelayedDeliveries(Integer minDelay) {
         logger.info("Fetching deliveries with delay greater than: " + minDelay + " minutes");
@@ -84,11 +84,11 @@ public class DeliveryHistoryService {
         return deliveryHistoryRepository.findAll(pageable);
     }
 
-    // AJOUT DE CETTE MÉTHODE MANQUANTE
-    public List<DeliveryHistory> getAllDeliveryHistory() {
+
+    /* public List<DeliveryHistory> getAllDeliveryHistory() {
         logger.info("Fetching all delivery history");
         return deliveryHistoryRepository.findAll();
-    }
+    }*/
 
     private LocalDateTime calculatePlannedTime(Tour tour, Delivery delivery) {
         // Logique améliorée pour calculer le temps planifié
@@ -100,4 +100,21 @@ public class DeliveryHistoryService {
             return tour.getDate().atTime(9, 0);
         }
     }
+
+    public List<DeliveryHistory> getCustomerDeliveryHistory(Long customerId) {
+        logger.info("Fetching delivery history for customer: " + customerId);
+        return deliveryHistoryRepository.findByCustomerId(customerId);
+    }
+
+
+    public List<DeliveryHistory> getTourDeliveryHistory(Long tourId) {
+        logger.info("Fetching delivery history for tour: " + tourId);
+        return deliveryHistoryRepository.findByTourId(tourId);
+    }
+
+
+    public List<DeliveryHistory> getAllDeliveryHistory() {
+        return deliveryHistoryRepository.findAll();
+    }
+
 }

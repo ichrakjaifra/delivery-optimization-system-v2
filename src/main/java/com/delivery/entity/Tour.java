@@ -52,7 +52,7 @@ public class Tour {
     private List<Delivery> deliveries = new ArrayList<>();
 
     public enum AlgorithmType {
-        NEAREST_NEIGHBOR, CLARKE_WRIGHT
+        NEAREST_NEIGHBOR, CLARKE_WRIGHT, AI_OPTIMIZER
     }
 
     public enum TourStatus {

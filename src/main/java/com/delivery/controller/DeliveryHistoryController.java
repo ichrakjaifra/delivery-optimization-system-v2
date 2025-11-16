@@ -11,8 +11,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.delivery.dto.DeliveryHistoryDTO;
+import com.delivery.mapper.DeliveryHistoryMapper;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/delivery-history")
@@ -20,16 +23,20 @@ import java.util.List;
 public class DeliveryHistoryController {
 
     private final DeliveryHistoryService deliveryHistoryService;
+    private final DeliveryHistoryMapper historyMapper;
 
-    public DeliveryHistoryController(DeliveryHistoryService deliveryHistoryService) {
+    public DeliveryHistoryController(DeliveryHistoryService deliveryHistoryService, DeliveryHistoryMapper historyMapper) {
         this.deliveryHistoryService = deliveryHistoryService;
+        this.historyMapper = historyMapper;
     }
 
     @GetMapping("/customer/{customerId}")
     @Operation(summary = "Get delivery history for a customer")
-    public ResponseEntity<List<DeliveryHistory>> getCustomerDeliveryHistory(@PathVariable Long customerId) {
+    public ResponseEntity<List<DeliveryHistoryDTO>> getCustomerDeliveryHistory(@PathVariable Long customerId) {
         try {
-            List<DeliveryHistory> history = deliveryHistoryService.getCustomerDeliveryHistory(customerId);
+            List<DeliveryHistoryDTO> history = deliveryHistoryService.getCustomerDeliveryHistory(customerId).stream()
+                    .map(historyMapper::toDTO)
+                    .collect(Collectors.toList());
             return ResponseEntity.ok(history);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -38,9 +45,11 @@ public class DeliveryHistoryController {
 
     @GetMapping("/tour/{tourId}")
     @Operation(summary = "Get delivery history for a tour")
-    public ResponseEntity<List<DeliveryHistory>> getTourDeliveryHistory(@PathVariable Long tourId) {
+    public ResponseEntity<List<DeliveryHistoryDTO>> getTourDeliveryHistory(@PathVariable Long tourId) { // ⬅️ تم التعديل هنا
         try {
-            List<DeliveryHistory> history = deliveryHistoryService.getTourDeliveryHistory(tourId);
+            List<DeliveryHistoryDTO> history = deliveryHistoryService.getTourDeliveryHistory(tourId).stream()
+                    .map(historyMapper::toDTO)
+                    .collect(Collectors.toList());
             return ResponseEntity.ok(history);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -49,9 +58,11 @@ public class DeliveryHistoryController {
 
     @GetMapping("/delayed")
     @Operation(summary = "Get delayed deliveries")
-    public ResponseEntity<List<DeliveryHistory>> getDelayedDeliveries(@RequestParam(defaultValue = "15") Integer minDelay) {
+    public ResponseEntity<List<DeliveryHistoryDTO>> getDelayedDeliveries(@RequestParam(defaultValue = "15") Integer minDelay) { // ⬅️ تعديل النوع
         try {
-            List<DeliveryHistory> delayed = deliveryHistoryService.getDelayedDeliveries(minDelay);
+            List<DeliveryHistoryDTO> delayed = deliveryHistoryService.getDelayedDeliveries(minDelay).stream()
+                    .map(historyMapper::toDTO)
+                    .collect(Collectors.toList());
             return ResponseEntity.ok(delayed);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -64,6 +75,10 @@ public class DeliveryHistoryController {
         try {
             List<DeliveryHistory> historyData = deliveryHistoryService.getCustomerDeliveryHistory(customerId);
 
+            List<DeliveryHistoryDTO> historyDTOs = historyData.stream()
+                    .map(historyMapper::toDTO)
+                    .collect(Collectors.toList());
+
             // Calcul des métriques simples
             long totalCount = historyData.size();
             long onTimeCount = historyData.stream()
@@ -75,7 +90,7 @@ public class DeliveryHistoryController {
                 public final long totalDeliveries = totalCount;
                 public final long onTimeDeliveries = onTimeCount;
                 public final double onTimeRate = calculatedRate;
-                public final List<DeliveryHistory> history = historyData;
+                public final List<DeliveryHistoryDTO> history = historyDTOs;
             };
 
             return ResponseEntity.ok(analytics);
@@ -86,7 +101,7 @@ public class DeliveryHistoryController {
 
     @GetMapping("/paged")
     @Operation(summary = "Get delivery history with pagination")
-    public ResponseEntity<Page<DeliveryHistory>> getDeliveryHistoryPaged(
+    public ResponseEntity<Page<DeliveryHistoryDTO>> getDeliveryHistoryPaged(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "deliveryDate") String sortBy,
@@ -95,8 +110,12 @@ public class DeliveryHistoryController {
             Sort.Direction sortDirection = direction.equalsIgnoreCase("asc") ?
                     Sort.Direction.ASC : Sort.Direction.DESC;
             Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
-            Page<DeliveryHistory> history = deliveryHistoryService.getDeliveryHistoryPaged(pageable);
-            return ResponseEntity.ok(history);
+
+            Page<DeliveryHistory> historyPage = deliveryHistoryService.getDeliveryHistoryPaged(pageable);
+
+            Page<DeliveryHistoryDTO> dtoPage = historyPage.map(historyMapper::toDTO);
+
+            return ResponseEntity.ok(dtoPage);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

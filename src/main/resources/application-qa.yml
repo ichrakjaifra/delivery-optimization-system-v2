@@ -15,7 +15,7 @@ spring:
 
 app:
   optimizer:
-    active: clarke_wright
+    active: ai
 
 logging:
   level:

@@ -1,5 +1,6 @@
 package com.delivery.controller;
 
+import com.delivery.dto.DeliveryHistoryDTO;
 import com.delivery.dto.TourDTO;
 import com.delivery.entity.Delivery;
 import com.delivery.entity.DeliveryHistory;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
+import com.delivery.mapper.DeliveryHistoryMapper;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,11 +26,13 @@ public class TourController {
     private final TourService tourService;
     private final TourMapper tourMapper;
     private final DeliveryHistoryService deliveryHistoryService;
+    private final DeliveryHistoryMapper historyMapper;
 
-    public TourController(TourService tourService, TourMapper tourMapper, DeliveryHistoryService deliveryHistoryService) {
+    public TourController(TourService tourService, TourMapper tourMapper, DeliveryHistoryService deliveryHistoryService, DeliveryHistoryMapper historyMapper) {
         this.tourService = tourService;
         this.tourMapper = tourMapper;
         this.deliveryHistoryService = deliveryHistoryService;
+        this.historyMapper = historyMapper;
     }
 
     @GetMapping
@@ -255,10 +259,13 @@ public class TourController {
 
     @GetMapping("/{tourId}/history")
     @Operation(summary = "Get delivery history for a tour")
-    public ResponseEntity<List<DeliveryHistory>> getTourHistory(@PathVariable Long tourId) {
+    public ResponseEntity<List<DeliveryHistoryDTO>> getTourHistory(@PathVariable Long tourId) { // ⬅️ تغيير النوع إلى DTO
         try {
-            List<DeliveryHistory> history = deliveryHistoryService.getTourDeliveryHistory(tourId);
-            return ResponseEntity.ok(history);
+            List<DeliveryHistoryDTO> historyDTOs = deliveryHistoryService.getTourDeliveryHistory(tourId).stream()
+                    .map(historyMapper::toDTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(historyDTOs);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

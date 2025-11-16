@@ -14,8 +14,15 @@ import java.util.List;
 public interface DeliveryHistoryRepository extends JpaRepository<DeliveryHistory, Long> {
 
     // Méthodes dérivées
-    List<DeliveryHistory> findByCustomerId(Long customerId);
-    List<DeliveryHistory> findByTourId(Long tourId);
+    //List<DeliveryHistory> findByCustomerId(Long customerId);
+    //List<DeliveryHistory> findByTourId(Long tourId);
+
+    @Query("SELECT dh FROM DeliveryHistory dh JOIN FETCH dh.customer c WHERE dh.customer.id = :customerId")
+    List<DeliveryHistory> findByCustomerId(@Param("customerId") Long customerId);
+
+    // تعديل دالة findByTourId
+    @Query("SELECT dh FROM DeliveryHistory dh JOIN FETCH dh.tour t JOIN FETCH dh.delivery d WHERE dh.tour.id = :tourId")
+    List<DeliveryHistory> findByTourId(@Param("tourId") Long tourId);
 
     // Requêtes personnalisées
     @Query("SELECT dh FROM DeliveryHistory dh WHERE dh.delayMinutes > :minDelay")
@@ -36,6 +43,11 @@ public interface DeliveryHistoryRepository extends JpaRepository<DeliveryHistory
 
     @Query("DELETE FROM DeliveryHistory dh WHERE dh.tour.id = :tourId")
     void deleteByTourId(@Param("tourId") Long tourId);
+
+    @Query("SELECT dh FROM DeliveryHistory dh JOIN FETCH dh.customer")
+    List<DeliveryHistory> findAllWithCustomer();
+
+
 
     // Statistiques avancées
     @Query("SELECT AVG(dh.delayMinutes) FROM DeliveryHistory dh WHERE dh.delayMinutes > 0")
