@@ -2,10 +2,10 @@
 
 <div align="center">
 
-https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk
-https://img.shields.io/badge/Spring%2520Boot-3.4.10-brightgreen?style=for-the-badge&logo=springboot
-https://img.shields.io/badge/Spring%2520AI-1.0.0-blue?style=for-the-badge&logo=spring
-https://img.shields.io/badge/Liquibase-4.25-green?style=for-the-badge&logo=liquibase
+![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring%2520Boot-3.4.10-brightgreen?style=for-the-badge&logo=springboot)
+![Spring AI](https://img.shields.io/badge/Spring%2520AI-1.0.0--M1-blue?style=for-the-badge&logo=spring)
+![Liquibase](https://img.shields.io/badge/Liquibase-Core-green?style=for-the-badge&logo=liquibase)
 ![H2 Database](https://img.shields.io/badge/H2-Database-blue?style=for-the-badge&logo=h2)
 
 **Solution intelligente d'optimisation des tournées de livraison avec intégration IA et gestion avancée des données**
