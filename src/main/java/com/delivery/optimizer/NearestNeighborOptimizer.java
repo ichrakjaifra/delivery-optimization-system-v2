@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
-
+@Component
 public class NearestNeighborOptimizer implements TourOptimizer {
 
     private static final Logger logger = Logger.getLogger(NearestNeighborOptimizer.class.getName());

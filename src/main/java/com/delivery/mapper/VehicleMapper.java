@@ -4,7 +4,7 @@ import com.delivery.dto.VehicleDTO;
 import com.delivery.entity.Vehicle;
 import org.springframework.stereotype.Component;
 
-
+@Component
 public class VehicleMapper {
 
     public VehicleDTO toDTO(Vehicle vehicle) {

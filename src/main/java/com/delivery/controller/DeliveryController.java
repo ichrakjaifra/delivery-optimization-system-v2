@@ -48,10 +48,10 @@ public class DeliveryController {
     }
 
     @PostMapping
-    public ResponseEntity<DeliveryDTO> createDelivery(@RequestBody DeliveryDTO deliveryDTO) {
+    public ResponseEntity<DeliveryDTO> createDelivery(@RequestBody DeliveryDTO deliveryDTO, @RequestParam Long customerId) {
         try {
             Delivery delivery = deliveryMapper.toEntity(deliveryDTO);
-            Delivery createdDelivery = deliveryService.createDelivery(delivery);
+            Delivery createdDelivery = deliveryService.createDelivery(delivery, customerId);
             DeliveryDTO createdDTO = deliveryMapper.toDTO(createdDelivery);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdDTO);
         } catch (Exception e) {
@@ -60,10 +60,10 @@ public class DeliveryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DeliveryDTO> updateDelivery(@PathVariable Long id, @RequestBody DeliveryDTO deliveryDTO) {
+    public ResponseEntity<DeliveryDTO> updateDelivery(@PathVariable Long id, @RequestBody DeliveryDTO deliveryDTO, @RequestParam(required = false) Long customerId) {
         try {
             Delivery delivery = deliveryMapper.toEntity(deliveryDTO);
-            Delivery updatedDelivery = deliveryService.updateDelivery(id, delivery);
+            Delivery updatedDelivery = deliveryService.updateDelivery(id, delivery, customerId);
             DeliveryDTO updatedDTO = deliveryMapper.toDTO(updatedDelivery);
             return ResponseEntity.ok(updatedDTO);
         } catch (RuntimeException e) {

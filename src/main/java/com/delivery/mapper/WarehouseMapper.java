@@ -4,7 +4,7 @@ import com.delivery.dto.WarehouseDTO;
 import com.delivery.entity.Warehouse;
 import org.springframework.stereotype.Component;
 
-
+@Component
 public class WarehouseMapper {
 
     public WarehouseDTO toDTO(Warehouse warehouse) {

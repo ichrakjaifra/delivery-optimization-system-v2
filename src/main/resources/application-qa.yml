@@ -1,0 +1,22 @@
+# Configuration QA/Test
+spring:
+  config:
+    activate:
+      on-profile: qa
+  datasource:
+    url: jdbc:postgresql://localhost:5432/delivery_qa
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: achraf123
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+
+app:
+  optimizer:
+    active: ai
+
+logging:
+  level:
+    com.delivery: INFO

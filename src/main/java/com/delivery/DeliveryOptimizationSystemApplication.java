@@ -2,14 +2,11 @@ package com.delivery;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.cloud.function.context.config.ContextFunctionCatalogAutoConfiguration;
 
-@SpringBootApplication
-@ImportResource("classpath:applicationContext.xml")
+@SpringBootApplication(exclude = ContextFunctionCatalogAutoConfiguration.class)
 public class DeliveryOptimizationSystemApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(DeliveryOptimizationSystemApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(DeliveryOptimizationSystemApplication.class, args);
+    }
 }

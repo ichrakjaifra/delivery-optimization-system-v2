@@ -2,12 +2,16 @@ package com.delivery.service;
 
 import com.delivery.entity.Warehouse;
 import com.delivery.repository.WarehouseRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+@Service
+@Transactional
 public class WarehouseService {
 
     private static final Logger logger = Logger.getLogger(WarehouseService.class.getName());
@@ -66,6 +70,28 @@ public class WarehouseService {
             return warehouseRepository.save(warehouse);
         }
         throw new RuntimeException("Warehouse not found with id: " + id);
+    }
+
+    @Transactional
+    public List<Warehouse> createWarehousesBatch(List<Warehouse> warehouses) {
+        logger.info("Creating " + warehouses.size() + " warehouses in batch");
+
+        List<Warehouse> createdWarehouses = new ArrayList<>();
+
+        for (Warehouse warehouse : warehouses) {
+            try {
+                warehouse.validate();
+                Warehouse savedWarehouse = warehouseRepository.save(warehouse);
+                createdWarehouses.add(savedWarehouse);
+                logger.info("Successfully created warehouse: " + warehouse.getName());
+            } catch (Exception e) {
+                logger.severe("Failed to create warehouse: " + warehouse.getName() + " - " + e.getMessage());
+                // Continuer avec les autres entrepôts même en cas d'erreur
+            }
+        }
+
+        logger.info("Batch creation completed. Success: " + createdWarehouses.size() + "/" + warehouses.size());
+        return createdWarehouses;
     }
 
     @Transactional

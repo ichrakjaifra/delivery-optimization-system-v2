@@ -1,0 +1,39 @@
+# Configuration par défaut
+spring:
+  profiles:
+    active: dev
+  application:
+    name: delivery-optimization-system
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+
+  # Configuration Spring AI avec Ollama
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: gemma3:4b
+        options:
+          temperature: 0.3
+          top-p: 0.9
+
+server:
+  port: 8080
+
+# Configuration des optimizers
+app:
+  optimizer:
+    active: ai  # ai, nearest_neighbor, clarke_wright
+
+logging:
+  level:
+    com.delivery: INFO
+    org.springframework.ai: DEBUG

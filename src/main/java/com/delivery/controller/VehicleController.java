@@ -4,6 +4,7 @@ import com.delivery.dto.VehicleDTO;
 import com.delivery.entity.Vehicle;
 import com.delivery.mapper.VehicleMapper;
 import com.delivery.service.VehicleService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -120,6 +121,29 @@ public class VehicleController {
             return ResponseEntity.ok(vehicles);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/batch")
+    @Operation(summary = "Create multiple vehicles in batch")
+    public ResponseEntity<List<VehicleDTO>> createVehiclesBatch(@RequestBody List<VehicleDTO> vehicleDTOs) {
+        try {
+            // Convertir les DTOs en entités
+            List<Vehicle> vehicles = vehicleDTOs.stream()
+                    .map(vehicleMapper::toEntity)
+                    .collect(Collectors.toList());
+
+            // Créer les véhicules en batch
+            List<Vehicle> createdVehicles = vehicleService.createVehiclesBatch(vehicles);
+
+            // Convertir en DTOs pour la réponse
+            List<VehicleDTO> createdDTOs = createdVehicles.stream()
+                    .map(vehicleMapper::toDTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdDTOs);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 }

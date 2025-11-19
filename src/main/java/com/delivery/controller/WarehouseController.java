@@ -4,6 +4,7 @@ import com.delivery.dto.WarehouseDTO;
 import com.delivery.entity.Warehouse;
 import com.delivery.mapper.WarehouseMapper;
 import com.delivery.service.WarehouseService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -82,6 +83,29 @@ public class WarehouseController {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/batch")
+    @Operation(summary = "Create multiple warehouses in batch")
+    public ResponseEntity<List<WarehouseDTO>> createWarehousesBatch(@RequestBody List<WarehouseDTO> warehouseDTOs) {
+        try {
+            // Convertir les DTOs en entités
+            List<Warehouse> warehouses = warehouseDTOs.stream()
+                    .map(warehouseMapper::toEntity)
+                    .collect(Collectors.toList());
+
+            // Créer les entrepôts en batch
+            List<Warehouse> createdWarehouses = warehouseService.createWarehousesBatch(warehouses);
+
+            // Convertir en DTOs pour la réponse
+            List<WarehouseDTO> createdDTOs = createdWarehouses.stream()
+                    .map(warehouseMapper::toDTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdDTOs);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 }

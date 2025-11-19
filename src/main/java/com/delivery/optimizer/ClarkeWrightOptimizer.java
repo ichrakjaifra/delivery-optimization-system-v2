@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-
+@Component
 public class ClarkeWrightOptimizer implements TourOptimizer {
 
     private static final Logger logger = Logger.getLogger(ClarkeWrightOptimizer.class.getName());
