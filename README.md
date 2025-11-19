@@ -3,8 +3,8 @@
 <div align="center">
 
 ![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk)
-![Spring Boot](https://img.shields.io/badge/Spring%2520Boot-3.4.10-brightgreen?style=for-the-badge&logo=springboot)
-![Spring AI](https://img.shields.io/badge/Spring%2520AI-1.0.0--M1-blue?style=for-the-badge&logo=spring)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.10-brightgreen?style=for-the-badge&logo=springboot)
+![Spring AI](https://img.shields.io/badge/Spring%20AI-1.0.0--M1-blue?style=for-the-badge&logo=spring)
 ![Liquibase](https://img.shields.io/badge/Liquibase-Core-green?style=for-the-badge&logo=liquibase)
 ![H2 Database](https://img.shields.io/badge/H2-Database-blue?style=for-the-badge&logo=h2)
 
